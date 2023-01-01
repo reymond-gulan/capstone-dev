@@ -11,11 +11,11 @@
                 "icon"=> "bx bx-list-ul",
                 "url"=> "../faculty/subjects.php"
             ],
-            [
-                "caption"=> "Report",
-                "icon"=> "bx bx-pie-chart-alt-2",
-                "url"=> "../faculty/facultyreport.php"
-            ],
+            // [
+            //     "caption"=> "Report",
+            //     "icon"=> "bx bx-pie-chart-alt-2",
+            //     "url"=> "../faculty/facultyreport.php"
+            // ],
             [
                 "caption"=> "Attendance",
                 "icon"=> "bx bx-calendar",

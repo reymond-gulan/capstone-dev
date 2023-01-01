@@ -21,16 +21,12 @@ include "./shared/nav-items.php";
 </div>
   <section class="home-section">
     <div class="header">
-      <h1>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNLOGY</h1>
+      <h3>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNOLOGY</h3>
     </div>
     <nav>
       <div class="sidebar-button">
         <i class="bx bx-menu sidebarBtn"></i>
         <span class="dashboard">Dashboard</span>
-      </div>
-      <div class="search-box">
-        <input type="text" placeholder="Search..." />
-        <i class="bx bx-search"></i>
       </div>
     </nav>
 

@@ -39,6 +39,8 @@ if($_SESSION['user_id'] == "")
   <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script>
         $(document).ready(function() {
             $('#dataTable_1').DataTable();
@@ -55,7 +57,7 @@ if($_SESSION['user_id'] == "")
   </div>
   <section class="home-section">
   <div class="header">
-      <h5>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNLOGY</h5>
+      <h3>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNOLOGY</h3>
     </div>
     <nav>
       <div class="sidebar-button">
@@ -108,12 +110,12 @@ if($_SESSION['user_id'] == "")
                   </td>
                   <td>
                     <a href="subject_edit_record.php?id=<?= $item["id"] ?>">
-                      <i class='fas fa-edit' style='font-size:24px;color:black'></i>
+                    <i class='far fa-edit text-info h4'></i>
                     </a>
-                    <a href='subject_delete_record.php?id=<?= $item['id']; ?>' 
-                       onClick="return confirm('are you sure you want to delete this?');">
-                        <i class='far fa-trash-alt' style='font-size:24px;color:red'></i>
-                    </a>
+                    <a href="#" class="delete"
+                             data-subject_id ="<?=$item['id']?>">    
+                                <i class="far fa-trash-alt text-danger h4"></i>
+                            </a>
                   </td>
                 
                 </tr>
@@ -124,14 +126,52 @@ if($_SESSION['user_id'] == "")
         </div>
       </section>
       <script>
-      let sidebar = document.querySelector(".sidebar");
+     
+     let sidebar = document.querySelector(".sidebar");
       let sidebarBtn = document.querySelector(".sidebarBtn");
       sidebarBtn.onclick = function() {
         sidebar.classList.toggle("active");
         if (sidebar.classList.contains("active")) {
           sidebarBtn.classList.replace("bx-menu", "bx-menu-alt-right");
         } else sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-      };
+      }; 
+
+    $(function(){
+        $(document).on('click','.delete', function(){
+            var subject_id  = $(this).data('subject_id');
+           
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Once deleted, it cannot be undone. Proceed anyway?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                    $.ajax({
+                        url:'subject_delete_record.php',
+                        method:'POST',
+                        data:{
+                          subject_id:subject_id,
+                            delete:`delete`
+                        },
+                        dataType:'json',
+                        success:function(response){
+                          console.log (response);
+                            if(response == 'success') {
+                                 location.href = 'subject.php';
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        
+    });
+
     </script>
       <?php include 'modal/subject_modal.php';?>
       <?php include 'modal/importSubject_modal.php';?>

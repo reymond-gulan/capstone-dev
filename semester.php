@@ -62,6 +62,8 @@ if($_SESSION['user_id'] == "")
   <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body>
@@ -73,17 +75,14 @@ if($_SESSION['user_id'] == "")
   </div>
   <section class="home-section">
   <div class="header">
-      <h1>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNLOGY</h1>
+      <h3>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHN0LOGY</h3>
     </div>
     <nav>
       <div class="sidebar-button">
         <i class="bx bx-menu sidebarBtn"></i>
         <span class="dashboard">Semester Record</span>
       </div>
-      <div class="search-box">
-        <input type="text" placeholder="Search..." />
-        <i class="bx bx-search"></i>
-      </div>
+     
     </nav>
 
     <div class="home-content">
@@ -128,12 +127,12 @@ if($_SESSION['user_id'] == "")
                 </td>
                 <td>
                   <a href="semester_edit_record.php?id=<?= $item["id"] ?>">
-                    <i class='fas fa-edit' style='font-size:24px;color:black'></i>
+                  <i class='far fa-edit text-info h4'></i>
                   </a>
-                  <a href='semester_delete_record.php?id=<?= $item['id']; ?>' 
-                     onClick="return confirm('are you sure you want to delete this?');">
-                      <i class='far fa-trash-alt' style='font-size:24px;color:red'></i>
-                  </a>
+                  <a href="#" class="delete"
+                             data-semester_id ="<?=$item['id']?>">    
+                                <i class="far fa-trash-alt text-danger h4"></i>
+                            </a>
                 </td>
               </tr>
             <?php } ?>
@@ -152,6 +151,42 @@ if($_SESSION['user_id'] == "")
           sidebarBtn.classList.replace("bx-menu", "bx-menu-alt-right");
         } else sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
       };
+
+      $(function(){
+        $(document).on('click','.delete', function(){
+            var semester_id  = $(this).data('semester_id');
+           
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Once deleted, it cannot be undone. Proceed anyway?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                    $.ajax({
+                        url:'semester_delete_record.php',
+                        method:'POST',
+                        data:{
+                          semester_id:semester_id,
+                            delete:`delete`
+                        },
+                        dataType:'json',
+                        success:function(response){
+                          console.log (response);
+                            if(response == 'success') {
+                                 location.href = 'semester.php';
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        
+    });
     </script>
     <?php include 'modal/semester_modal.php';?>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

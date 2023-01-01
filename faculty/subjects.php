@@ -50,7 +50,7 @@ if(isset($_SESSION['user_id'])) {
   </div>
   <section class="home-section">
     <div class="header">
-      <h1>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNLOGY</h1>
+      <h1>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNOLOGY</h1>
     </div>
     <nav>
       <div class="sidebar-button">

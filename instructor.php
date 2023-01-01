@@ -39,6 +39,8 @@ $number_daw_sabi_ni_czarina = 1;
   <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body>
@@ -50,17 +52,14 @@ $number_daw_sabi_ni_czarina = 1;
   </div>
   <section class="home-section">
     <div class="header">
-      <h1>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNLOGY</h1>
+      <h3>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNOLOGY</h3>
     </div>
     <nav>
       <div class="sidebar-button">
         <i class="bx bx-menu sidebarBtn"></i>
         <span class="dashboard">Instructor Management</span>
       </div>
-      <div class="search-box">
-        <input type="text" placeholder="Search..." />
-        <i class="bx bx-search"></i>
-      </div>
+     
     </nav>
 
     <div class="home-content">
@@ -90,12 +89,12 @@ $number_daw_sabi_ni_czarina = 1;
                 <!-- <td><a href="instructor_subject_assign.php?id=<?= $item["id"] ?>">Assign Subjects</a> </td> -->
                 <td>
                   <a href="instructor_edit_record.php?id=<?= $item["id"] ?>">
-                    <i class='fas fa-edit' style='font-size:24px;color:black'></i>
+                  <i class='far fa-edit text-info h4'></i>
                   </a>
-                  <a href='instructor_delete_record.php?id=<?= $item['id']; ?>' 
-                     onClick="return confirm('are you sure you want to delete this?');">
-                      <i class='far fa-trash-alt' style='font-size:24px;color:red'></i>
-                  </a>
+                  <a href="#" class="delete"
+                             data-instructor_id ="<?=$item['id']?>">    
+                                <i class="far fa-trash-alt text-danger h4"></i>
+                            </a>
                 </td>
               </tr>
             <?php } ?>
@@ -113,6 +112,42 @@ $number_daw_sabi_ni_czarina = 1;
           sidebarBtn.classList.replace("bx-menu", "bx-menu-alt-right");
         } else sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
       };
+
+      $(function(){
+        $(document).on('click','.delete', function(){
+            var instructor_id  = $(this).data('instructor_id');
+           
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Once deleted, it cannot be undone. Proceed anyway?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                    $.ajax({
+                        url:'instructor_delete_record.php',
+                        method:'POST',
+                        data:{
+                          instructor_id:instructor_id,
+                            delete:`delete`
+                        },
+                        dataType:'json',
+                        success:function(response){
+                          console.log (response);
+                            if(response == 'success') {
+                                 location.href = 'instructor.php';
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        
+    });
     </script>
      <?php include 'modal/instructor_modal.php';?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>

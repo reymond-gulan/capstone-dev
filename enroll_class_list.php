@@ -49,10 +49,7 @@ $result = $stmt->get_result();
         <span class="dashboard">Class List </span>
         </div>
 
-        <div class="search-box">
-                <input type="text" placeholder="Search..." />
-                <i class="bx bx-search"></i>
-        </div>
+      
     </nav>
 
 <div class="home-content attendance px-3">

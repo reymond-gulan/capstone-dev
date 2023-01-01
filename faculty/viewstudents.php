@@ -1,5 +1,12 @@
 <?php
 require("../config/config.php");
+session_start();
+if($_SESSION['user_id'] == "")
+{
+    $_SESSION['user_id'];
+    header('location:../index.php');
+    exit;
+}
 if(isset($_GET['id'])) {
     $class_id = $_GET['id'];
     $query     = $conn->prepare("SELECT *

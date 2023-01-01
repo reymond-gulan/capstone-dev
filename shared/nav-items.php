@@ -16,11 +16,11 @@
               "icon"=> "bx bxs-school",
               "url"=> "enroll.php"
           ],
-            [
-                "caption"=> "QR Generator",
-                "icon"=> "bx bx-barcode-reader",
-                "url"=> "qr.php"
-            ],
+            // [
+            //     "caption"=> "QR Generator",
+            //     "icon"=> "bx bx-barcode-reader",
+            //     "url"=> "qr.php"
+            // ],
             [
                 "caption"=> "Course",
                 "icon"=> "bx bx-list-ul",

@@ -25,7 +25,7 @@ $result = $stmt->get_result();
   </div>
   <section class="home-section">
     <div class="header">
-      <h5>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNLOGY</h5>
+      <h3>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNOLOGY</h3>
     </div>
     <nav>
         <div class="sidebar-button">
@@ -33,10 +33,7 @@ $result = $stmt->get_result();
         <span class="dashboard">Class Management </span>
         </div>
 
-        <div class="search-box">
-                <input type="text" placeholder="Search..." />
-                <i class="bx bx-search"></i>
-        </div>
+       
     </nav>
 
 <div class="home-content mt-0 attendance">
@@ -142,7 +139,7 @@ $result = $stmt->get_result();
                         <td><?=$row['yr_and_section']?></td>
                         <td>
                             <a href="enroll_class_list.php?id=<?=$row['class_id']?>"
-                             class="btn btn-sm border rounded small">
+                             class="btn btn-outline-primary btn btn-sm border rounded small">
                                 Class List
                             </a>
                         </td>
