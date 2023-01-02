@@ -53,11 +53,11 @@
                  * 
                  * ***/
 
-                // if(strtotime($time_in) > strtotime($end_time)) {
-                //     $response['status'] = 'error';
-                //     $response['message'] = "Schedule for this class has already ended. You are not allowed to submit your attendance after the scheduled time.";
-                //     exit(json_encode($response));
-                // }
+                if(strtotime($time_in) > strtotime($end_time)) {
+                    $response['status'] = 'error';
+                    $response['message'] = "Schedule for this class has already ended. You are not allowed to submit your attendance after the scheduled time.";
+                    exit(json_encode($response));
+                }
 
                 $grace_period = 900; // 15 minutes in seconds
 
