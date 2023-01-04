@@ -104,7 +104,8 @@ if($_SESSION['user_id'] == "")
                FROM tblstudentinfo AS A 
                       INNER JOIN tblcourse AS B ON A.fk_course_id = B.id 
                       INNER JOIN tblyear AS C ON A.fk_year_id = C.id
-                      INNER JOIN tblsection AS D ON A.fk_section_id = D.id";
+                      INNER JOIN tblsection AS D ON A.fk_section_id = D.id 
+                      WHERE A.is_deleted = '0'";
 
               $res = $conn->prepare($sql);
               $res->execute();
