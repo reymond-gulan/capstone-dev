@@ -105,10 +105,10 @@
                         <p>Schedule: <?=date('h:i a', strtotime($row3['start_time']))?> to <?=date('h:i a', strtotime($row3['end_time']))?></p>
                     </h5>
                 </center>
-                <form action="" method="POST" class="form-harizontal d-none">
+                <form action="" method="POST" class="form-harizontal">
                     <label><b>SCAN QR CODE</b></label>
                     <input type="hidden" name="schedule_id" id="schedule_id" value="<?=$row3['schedule_id']?>" readonly>
-                    <input type="text" name="student_id" id="student_id" readonly="" placeholder="Scan Qr Code" class="form-control">
+                    <input type="text" name="student_id" id="student_id" placeholder="Scan Qr Code" class="form-control">
                     <button type="submit" id="submit" class="d-none">
                         SUBMIT
                     </button>
@@ -188,6 +188,7 @@ $(function(){
                     //load(class_id);  
 
                     $('.table-responsive').html(response.html);
+                    $('#student_id').trigger('focus');
                 }
             }
         });
