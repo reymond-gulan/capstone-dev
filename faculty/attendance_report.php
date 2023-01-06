@@ -177,6 +177,10 @@ if(isset($_POST['class_id'])) {
             </center>
         
         <?php if(mysqli_num_rows($result2) > 0):?>
+            <button type="button" class="btn btn-info pull-right" onclick="printDiv()">
+                <i class="fa fa-print"></i>
+            </button>
+            <div id="printArea">
             <table class="table-bordered small my-4" id="dt">
                 <thead>
                     <tr>
@@ -244,6 +248,7 @@ if(isset($_POST['class_id'])) {
                     <?php endforeach;?>
                 </tbody>
             </table>
+            </div>
         <?php else: ?>
             <div class="row justify-content-center">
                 <div class="col-sm-6 alert alert-warning">
@@ -272,6 +277,18 @@ if(isset($_POST['class_id'])) {
     </script>
 <?php endif;?>
 <script>
+function printDiv() 
+{
+    var div = document.getElementById('printArea');
+    var print = window.open('','Print Window');
+    var img   = '<center><img src="../css/logo.png" alt="LOGO" height="130" class="m-0" style="margin-bottom:-50px !important;"></center><br />';
+    var title = 'Isabela State University';
+    var body = '';
+    var prepared_by = 'Prepared by: <br /><br /><b><?=$_SESSION['USER_NAME']?></b> <br /><?=date('F j, Y h:i a')?>';
+    print.document.open();
+    print.document.write('<html><head><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous"></head><style>.main{font-size:10px !important;}table{font-size:11px !important;}p{line-height:1.2 !important;padding:0;margin:0;}.uppercase{text-transform:uppercase !important;}.dataTables_info,.dataTables_length,.dataTables_filter,.dataTables_paginate{display:none !important;}</style><body onload="window.print()" class="p-5">'+img+'<br /><center><h4><b>'+title+'</b> <br /> San Fabian, Echague, Isabela</center> '+body+'<br /><br /><main>'+div.innerHTML+'<br /><br /><br />'+prepared_by+'</main></body></html>');
+    print.document.close();
+}
     $(function(){
         $('#dt').DataTable({
             ordering:false,
