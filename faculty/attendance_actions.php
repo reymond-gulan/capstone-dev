@@ -1,5 +1,8 @@
 <?php
     include('../config/config.php');
+    session_start();
+
+    
 
     date_default_timezone_set("Asia/Manila");
     $response = array();
@@ -8,6 +11,7 @@
         $student_id     = filter($_POST['student_id']);
         $class_id     = filter($_POST['class_id']);
         $schedule_id     = filter($_POST['schedule_id']);
+        $faculty_id = $_SESSION['user_id'];
         $time_in = date('h:i a');
         $logdate = date('Y-m-d');
 
@@ -16,6 +20,11 @@
         $query->execute();
 
         $result = $query->get_result();
+
+        $semester = $conn->prepare("SELECT * FROM tblsemester WHERE is_active = true");
+        $semester->execute();
+        $sr = $semester->get_result();
+        $sem = mysqli_fetch_array($sr);
 
         if(mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_array($result);
@@ -71,9 +80,9 @@
                     $status = "Late";
                 }
 
-                $insert = $conn->prepare("INSERT INTO tblattendance(fk_student_id, fk_subject_id, time_in, logdate, schedule_id, is_late)
-                                            VALUES(?,?,?,?,?,?)");
-                $insert->bind_param('iisssi', $row['id'], $class_id, $time_in, $logdate, $schedule_id, $is_late);
+                $insert = $conn->prepare("INSERT INTO tblattendance(fk_student_id, fk_subject_id, time_in, logdate, schedule_id, is_late, faculty_id, semester_id)
+                                            VALUES(?,?,?,?,?,?,?,?)");
+                $insert->bind_param('iisssiii', $row['id'], $class_id, $time_in, $logdate, $schedule_id, $is_late, $faculty_id, $sem['id']);
                 if($insert->execute()) {
                     
                     $response['status'] = 'success';

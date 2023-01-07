@@ -3,6 +3,8 @@
 
     session_start();
     $_SESSION['user_id'];
+
+    date_default_timezone_set("Asia/Manila");
     if(isset($_GET['id']) && isset($_SESSION['user_id'])) {
         $class_id   = filter($_GET['id']);
 

@@ -97,8 +97,10 @@ if(isset($_SESSION['user_id'])) {
 
                                             ?>
                                             <li style="text-transform:none;">
-                                            <?=$sch['day_of_the_week']?> | <?=date('h:i a', strtotime($sch['start_time']))?> to <?=date('h:i a', strtotime($sch['end_time']))?> |
-                                            <?=strtoupper($sch['room_details'])?>
+                                            <?=$sch['day_of_the_week'] ?? ''?> | 
+                                            <?= (isset($sch['start_time'])) ? $sch['start_time'].' to ' : '';?>
+                                            <?= (isset($sch['end_time'])) ? $sch['end_time'].' to ' : '';?>|
+                                            <?=strtoupper($sch['room_details'] ?? '')?>
                                             </li>
                                             <?php
                                         }

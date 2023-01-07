@@ -116,7 +116,7 @@ if(isset($_POST['faculty_id'])) {
 <div class="container-fluid">
     <div class="row p-2" style="background:#0A2558; color:#FFF">
         <div class="col-sm-2">
-            <a href="faculty_page.php" class="btn text-white">
+            <a href="dashboard.php" class="btn text-white">
                 <i class="fa fa-caret-left"></i> <i class="fa fa-home"></i> GO BACK
             </a>
         </div>

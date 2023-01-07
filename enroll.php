@@ -101,23 +101,22 @@ $result = $stmt->get_result();
                         <td>
                             <ul class="small">
                             <?php
-                                //$schedule = explode('[","]', $row['schedules']);
-                                // foreach($schedule as $sched) {
-                                //     //$sch = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM schedules WHERE id = '".$row['subject_id']."'"));
-                                //     echo$sched;
-                                // }
-
                                 $schedule = json_decode($row['schedules']);
                                 
-                                foreach($schedule as $sched){
-                                    $sch = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM schedules WHERE schedule_id = '".$sched."'"));
+                                if($row['schedules'] !== 'null') {
+                                    foreach($schedule as $sched){
+                                        $sch = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM schedules WHERE schedule_id = '".$sched."'"));
 
-                                    ?>
-                                    <li style="text-transform:none;">
-                                    <?=$sch['day_of_the_week']?> | <?=date('h:i a', strtotime($sch['start_time']))?> to <?=date('h:i a', strtotime($sch['end_time']))?> |
-                                    <?=strtoupper($sch['room_details'])?>
-                                    </li>
-                                    <?php
+                                        ?>
+                                        <li style="text-transform:none;">
+                                        <?=$sch['day_of_the_week'] ?? ''?> | 
+                                        <?= (isset($sch['start_time'])) ? $sch['start_time'].' to ' : '';?>
+                                        <?= (isset($sch['end_time'])) ? $sch['end_time'].' to ' : '';?>
+                                        |
+                                        <?=strtoupper($sch['room_details'] ?? '')?>
+                                        </li>
+                                        <?php
+                                    }
                                 }
                             ?>
                             </ul>
