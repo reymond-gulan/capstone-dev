@@ -151,10 +151,6 @@ window.onload = function () {
         <i class="bx bx-menu sidebarBtn"></i>
         <span class="dashboard"></span><?php echo $_SESSION['USER_NAME'] ?>
       </div>
-      <div class="search-box">
-        <input type="text" placeholder="Search..." />
-        <i class="bx bx-search"></i>
-      </div>
     </nav>
 
     <div class="home-content">
