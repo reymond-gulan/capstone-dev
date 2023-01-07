@@ -103,7 +103,6 @@ if($_SESSION['user_id'] == "")
                 <th>Name</th>
                 <th>Sex</th>
                 <th>Course Year & Section</th>
-                <!-- <th>Assign Subject</th> -->
                 <th>Action</th>
               </tr>
             </thead>
@@ -117,13 +116,7 @@ if($_SESSION['user_id'] == "")
                     $semester_id = $active['id'];
                 }
 
-                $sql = "SELECT A.id, A.stud_id, A.fname, A.mname, A.lname, A.sex, B.coursecode, C.year_code, D.section_code, A.qrname
-                        FROM tblstudentinfo AS A 
-                                INNER JOIN tblcourse AS B ON A.fk_course_id = B.id 
-                                INNER JOIN tblyear AS C ON A.fk_year_id = C.id
-                                INNER JOIN tblsection AS D ON A.fk_section_id = D.id 
-                                WHERE A.is_deleted = '0'
-                                AND A.semester_id = $semester_id";
+                $sql = "SELECT * FROM tblstudentinfo WHERE semester_id = $semester_id";
               $res = $conn->prepare($sql);
               $res->execute();
 
@@ -139,7 +132,7 @@ if($_SESSION['user_id'] == "")
                 <td>" . $row['fname'] . " " . $row['mname'] . " " . $row['lname'] . "</td>
                 <td>" . $row['sex'] . "</td>
                 
-                <td>" . $row['coursecode'] . " " . $row['year_code'] . " - " . $row['section_code'] . "</td>
+                <td>" . $row['cys'] ."</td>
                 <td><a href = 'student_edit_record.php?id=" . $row['id'] . "'><i class='fas fa-edit' style='font-size:24px;color:black'></i></a> | ";
               ?>
 
