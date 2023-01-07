@@ -1,5 +1,10 @@
 <?php
 include('config/config.php');
+include('functions.php');
+
+$active = semester(1, $conn);
+$semester = semester(0, $conn);
+
 include('header.php');
 
 if(isset($_GET['id'])) {
@@ -27,10 +32,15 @@ if(isset($_GET['id'])) {
     exit;
 }
 
-$stmt   = $conn->prepare("SELECT * FROM tblstudentinfo WHERE is_deleted = false");
+$stmt   = $conn->prepare("SELECT * FROM tblstudentinfo WHERE is_deleted = false AND semester_id = ?");
+$stmt->bind_param('i', $active['id']);
 $stmt->execute();
 $result = $stmt->get_result();
 
+$c = $conn->prepare("SELECT * FROM tblstudentinfo WHERE is_deleted = false AND semester_id = ? GROUP BY cys");
+$c->bind_param('i', $active['id']);
+$c->execute();
+$c_result = $c->get_result();
 ?>
 <div class="container-fluid p-0">
 <div class="sidebar">
@@ -69,15 +79,20 @@ $result = $stmt->get_result();
                     <?php
                         $schedule = json_decode($row['schedules']);
 
-                        foreach($schedule as $sched){
-                            $sch = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM schedules WHERE schedule_id = '".$sched."'"));
+                        if($row['schedules'] !== 'null') {
+                            foreach($schedule as $sched){
+                                $sch = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM schedules WHERE schedule_id = '".$sched."'"));
 
-                            ?>
-                            <li style="text-transform:none;">
-                            <?=$sch['day_of_the_week']?> | <?=date('h:i a', strtotime($sch['start_time']))?> to <?=date('h:i a', strtotime($sch['end_time']))?> |
-                            <?=strtoupper($sch['room_details'])?>
-                            </li>
-                            <?php
+                                ?>
+                                <li style="text-transform:none;">
+                                <?=$sch['day_of_the_week'] ?? ''?> | 
+                                <?= (isset($sch['start_time'])) ? $sch['start_time'].' to ' : '';?>
+                                <?= (isset($sch['end_time'])) ? $sch['end_time'].' to ' : '';?>
+                                |
+                                <?=strtoupper($sch['room_details'] ?? '')?>
+                                </li>
+                                <?php
+                            }
                         }
                     ?>
                     </ul>
@@ -120,7 +135,7 @@ $result = $stmt->get_result();
 <!--- MODAL -->
 
 <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modal" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="modal"><b>
@@ -131,6 +146,11 @@ $result = $stmt->get_result();
         </button>
       </div>
       <div class="modal-body">
+        <?php foreach($c_result as $cys):?>
+            <button type="button" class="btn btn-info cys-btn" data-value="<?=strtoupper($cys['cys'])?>">
+            <?=strtoupper($cys['cys'])?>
+            </button>
+        <?php endforeach;?>
         <div id="student-list"></div>
       </div>
       <div class="modal-footer">
@@ -183,6 +203,13 @@ function load_class(class_id){
 
         $(document).on('click','.load-students', function(){
             load_class(class_id);
+        });
+
+        $(document).on('click','.cys-btn', function(){
+            var value = $(this).data('value');
+            $('#data_filter input').val(value);
+            $('#data_filter input').trigger('focus');
+            $('#data_filter input').trigger('keyup');
         });
 
         $(document).on('click','#select-all', function(){

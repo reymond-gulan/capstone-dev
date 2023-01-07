@@ -1,5 +1,7 @@
 <?php
 include('config/config.php');
+include('functions.php');
+$active = semester(1, $conn);
 
 $html = "";
 
@@ -34,8 +36,8 @@ if(isset($_POST['load'])) {
 
     $query  = $conn->prepare("SELECT * FROM class_list INNER JOIN tblstudentinfo
                             ON (class_list.student_id = tblstudentinfo.id)
-                             WHERE class_id = ? AND is_deleted = false");
-    $query->bind_param('i', $class_id);
+                             WHERE class_id = ? AND is_deleted = false AND tblstudentinfo.semester_id = ?");
+    $query->bind_param('ii', $class_id, $active['id']);
     $query->execute();
     $result = $query->get_result();
     $html .='<table class="table table-sm table-condensed mt-5" id="students">
@@ -103,6 +105,7 @@ if(isset($_POST['load_class'])) {
               <th>ID</th>
               <th>Name</th>
               <th>Sex</th>
+              <th>Course, Yr &amp; Section</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -113,6 +116,7 @@ if(isset($_POST['load_class'])) {
                             <td>'.$row['stud_id'].'</td>
                             <td>'.$row['lname'].', '.$row['fname'].' '.$row['mname'].'</td>
                             <td>'.$row['sex'].'</td>
+                            <td>'.strtoupper($row['cys']).'</td>
                             <td>
                                 <a href="#" class="add-to-class-list"
                                     data-id="'.$row['id'].'">
