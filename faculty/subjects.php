@@ -1,5 +1,10 @@
 <?php
 require("../config/config.php");
+include('../functions.php');
+
+$active = semester(1, $conn);
+$semester = semester(0, $conn);
+
 include "../shared_faculty/nav-items.php";
 session_start();
 if($_SESSION['user_id'] == "")
@@ -9,26 +14,29 @@ if($_SESSION['user_id'] == "")
     exit;
 }
 
-if(isset($_SESSION['user_id'])) {
-    $faculty_id = $_SESSION['user_id'];
-
-    $query  = $conn->prepare("SELECT *
-                                FROM
-                                    classes
-                                INNER JOIN tblinstructor 
-                                    ON (classes.instructor_id = tblinstructor.id)
-                                INNER JOIN tblsemester 
-                                    ON (classes.semester_id = tblsemester.id)
-                                INNER JOIN tblsubject 
-                                    ON (classes.subject_id = tblsubject.id)
-                                INNER JOIN tblcourse 
-                                    ON (classes.course_id = tblcourse.id)
-                                WHERE classes.instructor_id = ?");
-    $query->bind_param('i', $faculty_id);
-    $query->execute();
-
-    $result = $query->get_result();
+$faculty_id = $_SESSION['user_id'];
+if(isset($_POST['semester_id'])) {
+    $semester_id = $_POST['semester_id'];
+} else {
+    $semester_id = $active['id'];
 }
+
+$query  = $conn->prepare("SELECT *
+                            FROM
+                                classes
+                            INNER JOIN tblinstructor 
+                                ON (classes.instructor_id = tblinstructor.id)
+                            INNER JOIN tblsemester 
+                                ON (classes.semester_id = tblsemester.id)
+                            INNER JOIN tblsubject 
+                                ON (classes.subject_id = tblsubject.id)
+                            INNER JOIN tblcourse 
+                                ON (classes.course_id = tblcourse.id)
+                            WHERE classes.instructor_id = ? AND classes.semester_id = ?");
+$query->bind_param('ii', $faculty_id, $semester_id);
+$query->execute();
+
+$result = $query->get_result();
 
 ?>
 <!DOCTYPE html>
@@ -39,8 +47,21 @@ if(isset($_SESSION['user_id'])) {
   <title>Manage Student Profile</title>
   <link rel="stylesheet" href="../css/sidebar.css" />
   <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <style>
+    .btn{
+        padding:4px !important;
+        font-size:13px !important;
+        width:100%;
+        height:30px;
+        background:#081D45 !important;
+        text-transform:uppercase !important;
+        font-weight:bold;
+    }
+  </style>
 </head>
-
 <body>
   <div class="sidebar">
     <div class="logo-details">
@@ -50,17 +71,19 @@ if(isset($_SESSION['user_id'])) {
   </div>
   <section class="home-section">
     <div class="header">
-      <h1>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNOLOGY</h1>
+      <h5>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNOLOGY</h5>
     </div>
     <nav>
       <div class="sidebar-button">
         <i class="bx bx-menu sidebarBtn"></i>
         <span class="dashboard"></span><?php echo $_SESSION['USER_NAME'] ?>
       </div>
-      <div class="search-box">
-        <input type="text" placeholder="Search..." />
-        <i class="bx bx-search"></i>
-      </div>
+      <form action="" id="form" method="POST">
+        <div class="search-box">
+            <?=$semester?>
+            <i class="bx bx-search"></i>
+        </div>
+      </form>
     </nav>
 
     <div class="home-content">
@@ -74,9 +97,9 @@ if(isset($_SESSION['user_id'])) {
                 <th>Subjects</th>
                 <th>Schedule</th>
                 <th>Attendance</th>
-                <th>Attendance Report</th>
-                <th>View Student</th>
-                <th>Manage Seat Plan</th>
+                <th>Report</th>
+                <th>View</th>
+                <th>SeatPlan</th>
               </tr>
             </thead>
             <tbody>
@@ -107,10 +130,10 @@ if(isset($_SESSION['user_id'])) {
                                     ?>
                                 </ul>
                             </td>
-                            <td><a href="attendance.php?id=<?=$row['class_id']?>">Attendance</a></td>
-                            <td><a href="reports.php?id=<?=$row['class_id']?>">Attendance Report</a></td>
-                            <td><a href="viewstudents.php?id=<?=$row['class_id']?>">View Students</a></td>
-                            <td><a href="seatplan.php?id=<?=$row['class_id']?>">Seat Plan</a></td>
+                            <td><a class="btn" href="attendance.php?id=<?=$row['class_id']?>">Attendance</a></td>
+                            <td><a class="btn" href="reports.php?id=<?=$row['class_id']?>">Report</a></td>
+                            <td><a class="btn" href="viewstudents.php?id=<?=$row['class_id']?>">Students</a></td>
+                            <td><a class="btn" href="seatplan.php?id=<?=$row['class_id']?>">View</a></td>
                         </tr>
                     <?php endforeach;?>
                 <?php else:?>
@@ -138,6 +161,20 @@ if(isset($_SESSION['user_id'])) {
         } else sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
       };
     </script>
+    <script>
+        $(function(){
+            $('#semester_id').addClass('form-control h-100');
+
+            $('#semester_id').on('change', function(){
+                $('#form').trigger('submit');
+            });
+      });
+    </script>
+    <?php if(isset($_POST['semester_id'])):?>
+        <script>
+            $('#semester_id').val(<?=$_POST['semester_id']?>);
+        </script>
+    <?php endif;?>
 </body>
 
 </html>

@@ -92,6 +92,17 @@ if($_SESSION['user_id'] == "")
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 <link href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css" rel="stylesheet">
 <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<style>
+    .btn{
+        padding:4px !important;
+        font-size:13px !important;
+        width:100%;
+        height:30px;
+        background:#081D45 !important;
+        text-transform:uppercase !important;
+        font-weight:bold;
+    }
+  </style>
 </head>
 
 <body>
@@ -154,7 +165,7 @@ if($_SESSION['user_id'] == "")
                             <td><?=attended($conn, $class_id, $r['id'])?></td>
                             <td><?=(num($conn, $class_id) - attended($conn, $class_id, $r['id']))?></td>
                             <td>
-                                <a href="logs.php?id=<?=$r['id']?>&&class=<?=$class_id?>">
+                                <a class="btn" href="logs.php?id=<?=$r['id']?>&&class=<?=$class_id?>">
                                     LOGS
                                 </a>
                             </td>

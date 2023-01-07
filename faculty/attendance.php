@@ -163,7 +163,7 @@ $(function(){
     var class_id = <?=$class_id?>;
 
     //load(class_id);
-
+    $('#student_id').trigger('focus');
     $('.form-harizontal').on('submit', function(e){
         e.preventDefault();
         var student_id = $('#student_id').val();

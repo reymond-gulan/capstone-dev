@@ -73,10 +73,10 @@ if(isset($_GET['id'])) {
         <i class="bx bx-menu sidebarBtn"></i>
         <span class="dashboard"></span><?php echo $_SESSION['USER_NAME'] ?>
       </div>
-      <div class="search-box">
+      <!-- <div class="search-box">
         <input type="text" placeholder="Search..." />
         <i class="bx bx-search"></i>
-      </div>
+      </div> -->
     </nav>
     <!-- END OF THE SIDE BAR -->
     
