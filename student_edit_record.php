@@ -5,32 +5,29 @@ if (isset($_POST["btnsave"])) {
   $id = $_POST["id"];
   $stud_id = $_POST["txtstudid"];
   $fname = $_POST["txtfname"];
-  $mname = $_POST["txtmname"];
-  $lname = $_POST["txtlname"];
   $sex = $_POST["txtsex"];
-  $fk_course_id = $_POST["txtcourse"];
-  $fk_section_id = $_POST["txtsection"];
-  $fk_year_id = $_POST["txtyear"];
+  $course = $_POST["txtcourse"];
+  $year_and_section = $_POST["year_and_section"];
+  $cys = strtoupper($course).' '.$year_and_section;
 
   if ($stud_id == "") {
     echo "Please input valid Student ID!";
   } elseif ($fname == "") {
     echo "Please input valid Name!";
-  } elseif ($mname == "") {
-    echo "Please input valid Name!";
-  } elseif ($lname == "") {
-    echo "Please input valid Name!";
   } elseif ($sex == "") {
     echo "Please input valid sex!";
-  } elseif ($fk_course_id == "") {
-    echo "Please input valid Course!";
   } else {
 
 
-    $sql = "UPDATE tblstudentinfo SET stud_id=:stud_id, fname=:fname, mname=:mname, lname=:lname, sex=:sex, fk_course_id = :fk_course_id, fk_year_id = :fk_year_id, fk_section_id = :fk_section_id WHERE id = :recordid";
+    $sql = "UPDATE tblstudentinfo SET stud_id=:stud_id, fname=:fname, 
+                    sex=:sex, course = :course,
+                    year_and_section = :year_and_section, cys = :cys 
+                    WHERE id = :recordid";
 
     $result = $conn->prepare($sql);
-    $values = array(":stud_id" => $stud_id, ":fname" => $fname, ":mname" => $mname, ":lname" => $lname, ":sex" => $sex, ":fk_course_id" => $fk_course_id, ":fk_year_id" => $fk_year_id, ":fk_section_id" => $fk_section_id, ":recordid" => $id);
+    $values = array(":stud_id" => $stud_id, ":fname" => $fname, ":sex" => $sex, ":course" => $course, 
+                    ":year_and_section" => $year_and_section, ":cys" => $cys, 
+                    ":recordid" => $id);
 
     $result->execute($values);
 
@@ -53,6 +50,7 @@ if (isset($_POST["btnsave"])) {
   <link rel="stylesheet" href="css/add_record.css" />
   <!-- Font Awesome Cdn Link -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 
 <body>
@@ -76,9 +74,6 @@ if (isset($_POST["btnsave"])) {
         $mname = "";
         $lname = "";
         $sex = "";
-        $fk_course_id = "";
-        $fk_year_id = "";
-        $fk_section_id = "";
 
         try {
           $res = $conn->prepare($sql);
@@ -92,12 +87,9 @@ if (isset($_POST["btnsave"])) {
               $id = $row["id"];
               $stud_id  = $row["stud_id"];
               $fname = $row["fname"];
-              $mname = $row["mname"];
-              $lname = $row["lname"];
               $sex = $row["sex"];
-              $fk_course_id = $row["fk_course_id"];
-              $fk_year_id = $row["fk_year_id"];
-              $fk_section_id = $row["fk_section_id"];
+              $course = $row["course"];
+              $year_and_section = $row["year_and_section"];
             }
           } catch (PDOException $e) {
             die("An Error has been occured!");
@@ -111,12 +103,8 @@ if (isset($_POST["btnsave"])) {
           <h3>Edit & Update Student Record</h3>
           <label>Student ID Number:<br>
           <input type="text" value="<?php echo "$stud_id" ?>" name="txtstudid" required placeholder="Enter student ID #">
-          <label>First Name:<br>
-          <input type="text" value="<?php echo "$fname" ?>" name="txtfname" required placeholder="Enter student first name">
-          <label>Middle Name:<br>
-          <input type="text" value="<?php echo "$mname" ?>" name="txtmname" required placeholder="Enter student middle name">
-          <label>Last Name:<br>
-          <input type="text" value="<?php echo "$lname" ?>" name="txtlname" required placeholder="Enter student last name">
+          <label>Complete Name:<br>
+          <input type="text" value="<?php echo "$fname" ?>" name="txtfname" required placeholder="Enter student complete name">
           <label>Sex:<br>
           <select name="txtsex" value="<?php echo "$sex" ?>">
             <option value="Sex">Sex</option>
@@ -124,7 +112,7 @@ if (isset($_POST["btnsave"])) {
             <option value="Female">Female</option>
           </select>
           <label>Course:<br>
-          <select name="txtcourse" value="<?php echo "$fk_course_id" ?>">
+          <select name="txtcourse" id="course">
             <option value="">Course</option>
             <?php
             function courseOption()
@@ -138,55 +126,14 @@ if (isset($_POST["btnsave"])) {
 
               while ($courseid = $course->fetch()) {
                 extract($courseid);
-                echo "<option value='$id'>$coursecode</option>";
+                echo "<option value='$coursecode'>$coursecode</option>";
               }
             }
             courseOption();
             ?>
           </select>
-          <label>Year:<br>
-
-          <select name="txtyear" value="<?php echo "$fk_year_id" ?>">
-            <option value="">Year</option>
-            <?php
-            function yearOption()
-            {
-              require("config/db_connect.php");
-
-              $year = $conn->prepare("SELECT id, year_code FROM tblyear");
-              $year->execute();
-
-              $ans = $year->setFetchMode(PDO::FETCH_ASSOC);
-
-              while ($yearid = $year->fetch()) {
-                extract($yearid);
-                echo "<option value='$id'>$year_code</option>";
-              }
-            }
-            yearOption();
-            ?>
-          </select>
-          <label>Section:<br>
-          <select name="txtsection" value="<?php echo "$fk_section_id" ?>">
-            <option value="">Section</option>
-            <?php
-            function sectionOption()
-            {
-              require("config/db_connect.php");
-
-              $section = $conn->prepare("SELECT id, section_code FROM tblsection");
-              $section->execute();
-
-              $ans = $section->setFetchMode(PDO::FETCH_ASSOC);
-
-              while ($sectionid = $section->fetch()) {
-                extract($sectionid);
-                echo "<option value='$id'>$section_code</option>";
-              }
-            }
-            sectionOption();
-            ?>
-          </select>
+          <label>Yr. &amp; Section:</label>
+          <input type="text" name="year_and_section" value="<?php echo $year_and_section ?>" required placeholder="Enter year and section" class = "form-control">
 
           <input type="submit" name="btnsave" value="Save" class="form-btn">
           <li>
@@ -197,6 +144,11 @@ if (isset($_POST["btnsave"])) {
           </li>
         </form>
       </div>
+<script>
+    $(function(){
+        $('#course').val('<?=$course?>');
+    });
+</script>
 </body>
 
 </html>
