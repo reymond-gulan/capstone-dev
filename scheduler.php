@@ -80,7 +80,7 @@ if(isset($_GET['id'])) {
 
 $data = mysqli_fetch_array($result);
 
-if(isset($_POST['search'])){
+if(isset($_POST['semester_id'])){
     $semester_id = filter($_POST['semester_id']);
     $query  = $conn->prepare("SELECT * FROM schedules INNER JOIN tblsemester 
                                 ON (schedules.semester_id = tblsemester.id) WHERE subject_id = ?
@@ -121,9 +121,9 @@ include('header.php');
         </div>
 
         <div class="search-box" style="padding-top:0 !important;">
-            <form action="" method="POST">
+            <form action="" method="POST" id="search">
                 <?php if(mysqli_num_rows($r_semester) > 0):?>
-                    <select name="semester_id" class="form-control mt-0" style="height:50px !important;">
+                    <select name="semester_id" id="sem_id" class="form-control mt-0" style="height:50px !important;">
                         <?php foreach($r_semester as $r1):?>
                             <option value="<?=$r1['id']?>"><?=$r1['semester_code']?> - <?=$r1['semester_year']?></option>
                         <?php endforeach;?>
@@ -270,9 +270,18 @@ include('header.php');
 </div>
 
 <!--- MODAL -->
-
+<?php if(isset($_POST['semester_id'])):?>
+    <script>
+        $('#sem_id').val(<?=$_POST['semester_id']?>);
+    </script>
+<?php endif;?>
 <script>
     $(function(){
+
+        $('#sem_id').on('change', function(){
+            $('#search').trigger('submit');
+        });
+
         $(document).on('click','.delete', function(){
             var schedule_id = $(this).data('schedule_id');
             var id = $(this).data('id');

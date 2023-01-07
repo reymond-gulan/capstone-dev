@@ -242,7 +242,7 @@ $result = $stmt->get_result();
         <script>
             $('#semester_id').val(<?=$_POST['semester_id']?>);
         </script>
-    <?php endif;?>
+<?php endif;?>
 <script>
     $(function(){
         $('#dt').DataTable({
