@@ -1,4 +1,10 @@
 <?php
+include('config/config.php');
+include('functions.php');
+
+$active = semester(1, $conn);
+$semester = semester(0, $conn);
+
 @include("config/db_connect.php");
 include "./shared/nav-items.php";
 session_start();
@@ -56,8 +62,13 @@ if($_SESSION['user_id'] == "")
         <i class="bx bx-menu sidebarBtn"></i>
         <span class="dashboard">Student Profile</span>
       </div>
-
     
+      <form action="" id="form" method="POST">
+        <div class="search-box">
+            <?=$semester?>
+            <i class="bx bx-search"></i>
+        </div>
+      </form>
     </nav>
 
     <div class="home-content">
@@ -99,14 +110,20 @@ if($_SESSION['user_id'] == "")
             <tbody>
               <!--PHP CODE HERE LIST ALL THE DATA AVAILABLE IN DATABASE-->
               <?php
+                if(isset($_POST['semester_id'])) {
+                    $semester_id = $_POST['semester_id'];
+                    
+                } else {
+                    $semester_id = $active['id'];
+                }
 
-              $sql = "SELECT A.id, A.stud_id, A.fname, A.mname, A.lname, A.sex, B.coursecode, C.year_code, D.section_code, A.qrname
-               FROM tblstudentinfo AS A 
-                      INNER JOIN tblcourse AS B ON A.fk_course_id = B.id 
-                      INNER JOIN tblyear AS C ON A.fk_year_id = C.id
-                      INNER JOIN tblsection AS D ON A.fk_section_id = D.id 
-                      WHERE A.is_deleted = '0'";
-
+                $sql = "SELECT A.id, A.stud_id, A.fname, A.mname, A.lname, A.sex, B.coursecode, C.year_code, D.section_code, A.qrname
+                        FROM tblstudentinfo AS A 
+                                INNER JOIN tblcourse AS B ON A.fk_course_id = B.id 
+                                INNER JOIN tblyear AS C ON A.fk_year_id = C.id
+                                INNER JOIN tblsection AS D ON A.fk_section_id = D.id 
+                                WHERE A.is_deleted = '0'
+                                AND A.semester_id = $semester_id";
               $res = $conn->prepare($sql);
               $res->execute();
 
@@ -150,7 +167,19 @@ if($_SESSION['user_id'] == "")
           sidebarBtn.classList.replace("bx-menu", "bx-menu-alt-right");
         } else sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
       };
+      $(function(){
+        $('#semester_id').addClass('form-control h-100');
+
+        $('#semester_id').on('change', function(){
+            $('#form').trigger('submit');
+        });
+      });
     </script>
+    <?php if(isset($_POST['semester_id'])):?>
+        <script>
+            $('#semester_id').val(<?=$_POST['semester_id']?>);
+        </script>
+    <?php endif;?>
       <?php include 'modal/exportStudent_modal.php';?>
       <?php include 'modal/studentInfo_modal.php';?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>

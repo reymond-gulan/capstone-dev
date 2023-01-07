@@ -1,5 +1,9 @@
 <?php
 include('config/config.php');
+include('functions.php');
+
+$active = semester(1, $conn);
+$semester = semester(0, $conn);
 
 session_start();
 if($_SESSION['user_id'] == "")
@@ -11,7 +15,13 @@ if($_SESSION['user_id'] == "")
 
 include('header.php');
 
-$stmt   = $conn->prepare("SELECT * FROM classes WHERE is_deleted = false AND is_archived = false");
+if(isset($_POST['semester_id'])) {
+    $semester_id = $_POST['semester_id'];
+} else {
+    $semester_id = $active['id'];
+}
+$stmt   = $conn->prepare("SELECT * FROM classes WHERE is_deleted = false AND is_archived = false AND semester_id = ?");
+    $stmt->bind_param('i', $semester_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -33,20 +43,24 @@ $result = $stmt->get_result();
         <span class="dashboard">Class Management </span>
         </div>
 
-       
+        <form action="" id="form" method="POST">
+            <div class="search-box">
+                <?=$semester?>
+                <i class="bx bx-search"></i>
+            </div>
+        </form>
     </nav>
 
 <div class="home-content mt-0 attendance">
     <div class="container attendance-list">
         <label for="semester_id">SEMESTER :</label>
         <?php 
-            $query1 = $conn->prepare("SELECT * FROM tblsemester INNER JOIN schedules ON
-                                    (tblsemester.id = schedules.semester_id)
-                                     WHERE schedules.is_deleted = false GROUP BY schedules.semester_id");
+            $query1 = $conn->prepare("SELECT * FROM tblsemester
+                                     WHERE is_deleted = false AND is_active = true");
             $query1->execute();
             $result1 = $query1->get_result(); 
         ?>
-        <select name="semester_id" id="semester_id">
+        <select name="semester_id" id="sem_id">
             <option value="" selected>SELECT</option>
             <?php if(mysqli_num_rows($result1) > 0):?>
                 <?php foreach($result1 as $row1):?>
@@ -151,6 +165,13 @@ $result = $stmt->get_result();
                     </tr>                   
                 <?php endforeach;?>
             <?php else:?>
+                <tr>
+                    <td colspan="9">
+                        <center>
+                            No record found.
+                        </center>
+                    </td>
+                </tr>
             <?php endif;?>
           </tbody>
         </table>
@@ -206,7 +227,11 @@ $result = $stmt->get_result();
 </div>
 
 <!--- MODAL -->
-
+<?php if(isset($_POST['semester_id'])):?>
+        <script>
+            $('#semester_id').val(<?=$_POST['semester_id']?>);
+        </script>
+    <?php endif;?>
 <script>
     $(function(){
         $('#dt').DataTable({
@@ -214,7 +239,14 @@ $result = $stmt->get_result();
             ordering:  false,
             info:false
         });
-        $(document).on('focus', '#semester_id', function(){
+
+        $('#semester_id').addClass('form-control h-100');
+
+        $('#semester_id').on('change', function(){
+            $('#form').trigger('submit');
+        });
+
+        $(document).on('focus', '#sem_id', function(){
             $('#subjects-container').html('');
             $('#schedules-container').html('');
             $('#instructor').val('');
@@ -226,7 +258,7 @@ $result = $stmt->get_result();
             $('#instructor_id').val('');
         });
 
-        $(document).on('change','#semester_id', function(){
+        $(document).on('change','#sem_id', function(){
             var semester_id = $(this).val();
             $.ajax({
                 url:'enrollment_actions.php',

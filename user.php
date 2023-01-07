@@ -44,10 +44,7 @@ $number_daw_sabi_ni_czarina = 1;
         <i class="bx bx-menu sidebarBtn"></i>
         <span class="dashboard">User Management</span>
       </div>
-      <div class="search-box">
-        <input type="text" placeholder="Search..." />
-        <i class="bx bx-search"></i>
-      </div>
+      
     </nav>
 
     <div class="home-content">
