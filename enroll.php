@@ -26,6 +26,17 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 ?>
+<style>
+    .btn{
+        padding:4px !important;
+        font-size:13px !important;
+        height:30px;
+        background:#081D45 !important;
+        text-transform:uppercase !important;
+        font-weight:bold;
+        color:#FFF;
+    }
+  </style>
 <div class="container-fluid p-0">
 <div class="sidebar">
     <div class="logo-details">
@@ -152,8 +163,8 @@ $result = $stmt->get_result();
                         <td><?=$row['yr_and_section']?></td>
                         <td>
                             <a href="enroll_class_list.php?id=<?=$row['class_id']?>"
-                             class="btn btn-outline-primary btn btn-sm border rounded small">
-                                Class List
+                             class="btn" role="button">
+                                ClassList
                             </a>
                         </td>
                         <td>

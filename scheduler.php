@@ -23,7 +23,21 @@ if(isset($_POST['save'])) {
     $schedule_id = filter($_POST['schedule_id']);
 
     if(strtotime($end_time) < strtotime($start_time)) {
-        echo '<script>alert("Invalid time range."); location.href="scheduler.php?id='.$id.'";</script>';
+        echo '<script>alert("Invalid time range."); location.href="scheduler.php?id='.$subject_id.'";</script>';
+        exit;
+    }
+
+    $select = $conn->prepare("SELECT * FROM schedules 
+                                    WHERE subject_id = ? 
+                                    AND day_of_the_week = ? 
+                                    AND start_time = ? 
+                                    AND end_time = ?
+                                    AND semester_id = ?");
+    $select->bind_param('isssi',$subject_id,$day_of_the_week,$start_time,$end_time,$semester_id);
+    $select->execute();
+    $r_select = $select->get_result();
+    if(mysqli_num_rows($r_select) > 0) {
+        echo '<script>alert("Submitted record already exists"); location.href="scheduler.php?id='.$subject_id.'";</script>';
         exit;
     }
 
