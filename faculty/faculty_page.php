@@ -1,6 +1,8 @@
 <?php
 require("../config/config.php");
 include "../shared_faculty/nav-items.php";
+include('../functions.php');
+
 session_start();
 if($_SESSION['user_id'] == "")
 {
@@ -46,16 +48,17 @@ if(isset($_POST['search'])) {
     $date_from = filter($_POST['date_from']);
     $date_to = filter($_POST['date_to']);
     $fk_subject_id = filter($_POST['class_id']);
+    $semester_id = filter($_POST['semester_id']);
+    $group_by = filter($_POST['group_by']);
 
     $query2     = $conn->prepare("SELECT count(list_id) as num
-                                    FROM
-                                        class_list
-                                        INNER JOIN classes 
-                                            ON (class_list.class_id = classes.class_id)
-                                            WHERE class_list.class_id = ? 
-                                            GROUP BY student_id");
-
-    $query2->bind_param('i', $fk_subject_id);
+                                        FROM
+                                            class_list
+                                            INNER JOIN classes 
+                                                ON (class_list.class_id = classes.class_id)
+                                                WHERE class_list.class_id = ? AND semester_id = ?
+                                                GROUP BY student_id");
+    $query2->bind_param('ii',$fk_subject_id, $semester_id);
     $query2->execute();
 
     $result2 = $query2->get_result();
@@ -63,14 +66,54 @@ if(isset($_POST['search'])) {
         $students += $row2['num']; 
     }
 
-    $search = $conn->prepare("SELECT count(tblattendance.id) as count, logdate
+
+    
+
+    if(!empty($date_from) && !empty($date_to)){
+        
+        if($group_by == 'daily') {
+            $search = $conn->prepare("SELECT count(tblattendance.id) as count, logdate
                     FROM
                         tblattendance
                         RIGHT JOIN tblstudentinfo 
                             ON (tblattendance.fk_student_id = tblstudentinfo.id)
-                            WHERE faculty_id = ? AND fk_subject_id = ?
-                    GROUP BY logdate");
-    $search->bind_param('ii', $faculty_id, $fk_subject_id);
+                            WHERE faculty_id = ? AND fk_subject_id = ? 
+                            GROUP BY logdate");
+        } else if($group_by == 'monthly') {
+            $search = $conn->prepare("SELECT count(tblattendance.id) as count, logdate
+                    FROM
+                        tblattendance
+                        RIGHT JOIN tblstudentinfo 
+                            ON (tblattendance.fk_student_id = tblstudentinfo.id)
+                            WHERE faculty_id = ? AND fk_subject_id = ? 
+                            AND logdate BETWEEN ? AND ?
+                            GROUP BY DATE(logdate)");
+        }
+
+        $search->bind_param('iiss', $faculty_id, $fk_subject_id, $date_from, $date_to);
+
+    } else {
+        if($group_by == 'daily') {
+            $search = $conn->prepare("SELECT count(tblattendance.id) as count, logdate
+                    FROM
+                        tblattendance
+                        RIGHT JOIN tblstudentinfo 
+                            ON (tblattendance.fk_student_id = tblstudentinfo.id)
+                            WHERE faculty_id = ? AND fk_subject_id = ? 
+                            GROUP BY logdate");
+        } else if($group_by == 'monthly') {
+            $search = $conn->prepare("SELECT count(tblattendance.id) as count, logdate
+                    FROM
+                        tblattendance
+                        RIGHT JOIN tblstudentinfo 
+                            ON (tblattendance.fk_student_id = tblstudentinfo.id)
+                            WHERE faculty_id = ? AND fk_subject_id = ? 
+                            GROUP BY DATE(logdate)");
+        }
+
+        $search->bind_param('ii', $faculty_id, $fk_subject_id);
+    }
+
     $search->execute();
 
     $dataPoints = array();
@@ -144,7 +187,7 @@ window.onload = function () {
   </div>
   <section class="home-section">
     <div class="header">
-      <h3>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNOLOGY</h3>
+      <h5>COLLEGE OF COMPUTING STUDIES, INFORMATION AND COMMUNICATION TECHNOLOGY</h5>
     </div>
     <nav>
       <div class="sidebar-button">
@@ -157,8 +200,8 @@ window.onload = function () {
        <!-- Content Row -->
                <!-- Content Row -->
         <!-- Subject Card Example -->
-        <div class="container p-0">
-            <div class="col-sm-3" style="float:left;">
+        <div class="row justify-content-center">
+            <div class="col-sm-3">
                     <div class="card border-left-warning shadow mb-3">
                         <div class="card-body">
                             <div class="row no-gutters align-items-center">
@@ -178,6 +221,8 @@ window.onload = function () {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="col-sm-3">
                     <?php if(isset($_POST['search'])):?>
                     <!-- Student Card Example -->
                     <div class="card border-left-warning shadow">
@@ -201,59 +246,61 @@ window.onload = function () {
                     <?php endif;?>
                 </div>
             </div>
-            <div class="col-sm-9" style="float:left;">
-                <div class="container">
-                <div class="row">
-                    <div class="col-sm-3">
-                        <form action="" method="POST">
-                            <b>Subject</b>
-                            <select name="class_id" id="class_id" class="w-100">
-                                <option value="">SELECT</option>
-                                <?php foreach($rs as $rws):?>
-                                    <?php
-                                        $schedule = str_replace(array('[',']',"\"") ,'', $rws['schedules']);
-
-                                        $query3 = $conn->prepare("SELECT * FROM schedules WHERE schedule_id IN ($schedule)");
-                                        $query3->execute();
-                                        
-                                        $results = $query3->get_result();
-                                    ?>
-                                    <option value="<?=$rws['class_id']?>">
-                                        <?=strtoupper($rws['subject_code'])?> - <?=strtoupper($rws['subject_description'])?>
-                                        <br />
-                                        (<?php foreach($results as $rows):?>
-                                            <?=$rows['day_of_the_week']?> (<?=date('h:i a' , strtotime($rows['start_time']))?> to <?=date('h:i a' , strtotime($rows['end_time']))?>)
-                                        <?php endforeach;?>)
-                                    </option>
-                                <?php endforeach;?>
-                            </select>
-                            <b>From</b>
-                            <input type="date" name="date_from" id="date_from" class="w-100">
-                            <b>To</b>
-                            <input type="date" name="date_to" id="date_to" class="w-100">
-                            <button type="submit" class="btn btn-info mt-3 pull-right" name="search">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </form>
-                    </div>
-                    <div class="col-sm-9">
-                        <?php if(isset($_POST['search'])):?>
-                            <?php if(mysqli_num_rows($v) > 0):?>
-                                <div id="chartContainer"></div>
-                            <?php else:?>
-                                <center>
-                                    No result found. <br />
-                                    <i class="fa fa-chart-bar text-info border border-info rounded-circle p-5" style="font-size:200px;"></i>
-                                </center>
-                            <?php endif;?>
-                        <?php else:?>
-                            <center>
-                                Search to display graph. <br />
-                                <i class="fa fa-chart-bar text-info border border-info rounded-circle p-5" style="font-size:200px;"></i>
-                            </center>
-                        <?php endif;?>
-                    </div>
-                </div>
-                </div>
-            </div>
         </div>
+
+<div class="container">
+<div class="row mt-2">
+    <div class="col-sm-3" style="float:left;">
+        <form action="" method="POST">
+            <?=group()?>
+            <b>Semester</b>
+            <?=semester(0, $conn)?>
+            <b>Subject</b>
+            <select name="class_id" id="class_id" class="w-100" required>
+                <option value="">SELECT</option>
+                <?php foreach($rs as $rws):?>
+                    <?php
+                        $schedule = str_replace(array('[',']',"\"") ,'', $rws['schedules']);
+
+                        $query3 = $conn->prepare("SELECT * FROM schedules WHERE schedule_id IN ($schedule)");
+                        $query3->execute();
+                        
+                        $results = $query3->get_result();
+                    ?>
+                    <option value="<?=$rws['class_id']?>">
+                        <?=strtoupper($rws['subject_code'])?> - <?=strtoupper($rws['subject_description'])?>
+                        <br />
+                        (<?php foreach($results as $rows):?>
+                            <?=$rows['day_of_the_week']?> (<?=date('h:i a' , strtotime($rows['start_time']))?> to <?=date('h:i a' , strtotime($rows['end_time']))?>)
+                        <?php endforeach;?>)
+                    </option>
+                <?php endforeach;?>
+            </select>
+            <b>From</b>
+            <input type="date" name="date_from" id="date_from" class="w-100">
+            <b>To</b>
+            <input type="date" name="date_to" id="date_to" class="w-100">
+            <button type="submit" class="btn btn-info mt-3 pull-right" name="search">
+                <i class="fa fa-search"></i>
+            </button>
+        </form>
+    </div>
+    <div class="col-sm-9" style="float:left;">
+        <?php if(isset($_POST['search'])):?>
+            <?php if(mysqli_num_rows($v) > 0):?>
+                <div id="chartContainer"></div>
+            <?php else:?>
+                <center>
+                    No result found. <br />
+                    <i class="fa fa-chart-bar text-info border border-info rounded-circle p-5" style="font-size:200px;"></i>
+                </center>
+            <?php endif;?>
+        <?php else:?>
+            <center>
+                Search to display graph. <br />
+                <i class="fa fa-chart-bar text-info border border-info rounded-circle p-5" style="font-size:200px;"></i>
+            </center>
+        <?php endif;?>
+    </div>
+</div>
+</div>
