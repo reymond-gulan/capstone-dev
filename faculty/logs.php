@@ -18,27 +18,19 @@
 
         $result = $query->get_result();
         $row = mysqli_fetch_array($result);
+        
 
         $query2  = $conn->prepare("SELECT *
                                     FROM
                                         tblattendance
                                         INNER JOIN schedules 
                                             ON (tblattendance.schedule_id = schedules.schedule_id)
-                                    WHERE fk_student_id = ?");
-        $query2->bind_param('i', $id);
+                                    WHERE fk_subject_id = ?
+                                    GROUP BY logdate");
+        $query2->bind_param('i', $class_id);
         $query2->execute();
-
         $result2 = $query2->get_result();
-        
-        // $query3  = $conn->prepare("SELECT *
-        //                             FROM
-        //                                 tblattendance
-        //                                 INNER JOIN schedules 
-        //                                     ON (tblattendance.schedule_id = schedules.schedule_id)
-        //                             WHERE fk_subject_id = ? GROUP BY logdate");
-        // $query3->bind_param('i', $class_id);
-        // $query3->execute();
-        // $result3 = $query3->get_result();
+
     }
 ?>
 <!DOCTYPE html>
@@ -114,16 +106,29 @@
                         <tr>
                             <td><?=$row2['day_of_the_week']?> (<?=date('h:i a' , strtotime($row2['start_time']))?> <?=date('h:i a' , strtotime($row2['end_time']))?>)</td>
                             <td><?=date('F j, Y', strtotime($row2['logdate']))?></td>
-                            <td>
-                                <?=date('h:i a', strtotime($row2['time_in']))?>
-                            </td>
-                            <td>
-                                <?php if($row2['is_late'] == true):?>
-                                    Late
-                                <?php else:?>
-                                    On Time
-                                <?php endif;?>
-                            </td>
+                            <?php
+                                $select = $conn->prepare("SELECT * FROM tblattendance 
+                                    WHERE fk_student_id = ? AND logdate = ?");
+                                
+                                $select->bind_param('is', $id, $row2['logdate']);
+                                $select->execute();
+                                $r_select = $select->get_result();
+                            ?>
+                            <?php if(mysqli_num_rows($r_select) > 0):?>
+                                <td>
+                                    <?=date('h:i a', strtotime($row2['time_in']))?>
+                                </td>
+                                <td>
+                                    <?php if($row2['is_late'] == true):?>
+                                        Late
+                                    <?php else:?>
+                                        On Time
+                                    <?php endif;?>
+                                </td>
+                            <?php else:?>
+                                <td>n/a</td>
+                                <td>Absent</td>
+                            <?php endif;?>
                         </tr>
                     <?php endforeach;?>
                 </tbody>
