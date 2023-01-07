@@ -23,16 +23,8 @@
           <input type="text" name="txtstudid" required placeholder="Enter student ID #" class = "form-control">
           </div>
           <div class = "form-group">
-          <label>First Name:</label>
-          <input type="text" name="txtfname" required placeholder="Enter student first name"class = "form-control">
-          </div>
-          <div class = "form-group">
-            <label>Middle Name:</label>
-          <input type="text" name="txtmname" required placeholder="Enter student middle name"class = "form-control">
-          </div>
-          <div class = "form-group">
-            <label>Last Name:</label>
-          <input type="text" name="txtlname" required placeholder="Enter student last name" class = "form-control">
+          <label>Complete Name:</label>
+          <input type="text" name="txtfname" required placeholder="Enter student complete name" class = "form-control">
           </div>
           <div class = "form-group">
             <label>Sex</label>
@@ -56,56 +48,14 @@
 
             while ($courseid = $course->fetch()) {
               extract($courseid);
-              echo "<option value='$id'>$coursecode</option>";
+              echo "<option value='$coursecode'>$coursecode</option>";
             }
             ?>
           </select>
           </div>
           <div class = "form-group">
-          <label>Year</label>
-          <select name="txtyear" class = "form-control">
-            <option value="cboyear">Year</option>
-            <?php
-            function yearOption()
-            {
-              require("config/db_connect.php");
-
-              $year = $conn->prepare("SELECT id, year_code FROM tblyear");
-              $year->execute();
-
-              $ans = $year->setFetchMode(PDO::FETCH_ASSOC);
-
-              while ($yearid = $year->fetch()) {
-                extract($yearid);
-                echo "<option value='$id'>$year_code</option>";
-              }
-            }
-            yearOption();
-            ?>
-          </select>
-          </div>
-          <div class = "form-group" class = "form-control">
-          <label>Section</label>
-          <select name="txtsection" class = "form-control">
-            <option value="cbosection">Section</option>
-            <?php
-            function sectionOption()
-            {
-              require("config/db_connect.php");
-
-              $section = $conn->prepare("SELECT id, section_code FROM tblsection");
-              $section->execute();
-
-              $ans = $section->setFetchMode(PDO::FETCH_ASSOC);
-
-              while ($sectionid = $section->fetch()) {
-                extract($sectionid);
-                echo "<option value='$id'>$section_code</option>";
-              }
-            }
-            sectionOption();
-            ?>
-          </select>
+          <label>Yr. &amp; Section:</label>
+          <input type="text" name="year_and_section" required placeholder="Enter year and section" class = "form-control">
           </div>
 					</fieldset>
           <div class="modal-footer">
